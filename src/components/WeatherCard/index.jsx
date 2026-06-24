@@ -3,7 +3,7 @@ import "./styles.css";
 const WeatherCard = ({ weather }) => {
     return (
         <section className="weather-card">
-            <p>Hoje ({weather.forecast[0].date})</p>
+            <p>Hoje - {weather.forecast[0].date}</p>
             <img src={`./icons-weather/${weather.condition_slug}.svg`} alt={weather.description} />
             <h2 className="temperature">{weather.temp}°</h2>
             <p className="condition">{weather.description}</p>
