@@ -6,9 +6,9 @@ import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-const CITY = "São José dos Campos, SP";
 
 function App() {
+    const [city, setCity] = useState("");
     const [loading, setLoading] = useState(false);
     const [weather, setWeather] = useState(null);
     const [forecast, setForecast] = useState(null);
@@ -17,7 +17,7 @@ function App() {
         async function fetchWeather() {
             setLoading(true);
             try {
-                const response = await fetch(`https://api.hgbrasil.com/weather?key=${API_KEY}&format=json-cors&city_name=${CITY}`);
+                const response = await fetch(`https://api.hgbrasil.com/weather?key=${API_KEY}&format=json-cors&city_name=${city}`);
                 const data = await response.json();
                 if (data.results) {
                     setWeather(data.results);
@@ -31,21 +31,21 @@ function App() {
         }
 
         fetchWeather();
-    }, []);
+    }, [city]);
 
     return (
         <div className="app-container">
-            <SearchBar />
+            <SearchBar onSearch={setCity} />
             {loading ? (
                 <Loading />
+            ) : weather ? (
+                <>
+                    <h1>{weather.city}</h1>
+                    <WeatherCard weather={weather} />
+                    <ForecastList forecasts={forecast} />
+                </>
             ) : (
-                weather && (
-                    <>
-                        <h1>{weather.city}</h1>
-                        <WeatherCard weather={weather} />
-                        <ForecastList forecasts={forecast} />
-                    </>
-                )
+                <p>Digite uma cidade para buscar o clima.</p>
             )}
         </div>
     );

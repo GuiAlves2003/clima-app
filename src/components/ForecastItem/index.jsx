@@ -1,7 +1,6 @@
 import "./styles.css";
 
 const getWeekday = (fullDate) => {
-    console.log(fullDate);
     const [day, month, year] = fullDate.split("/");
     const date = new Date(year, month - 1, day);
     const weekday = Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(date);
