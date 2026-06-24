@@ -12,16 +12,19 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [weather, setWeather] = useState(null);
     const [forecast, setForecast] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        async function fetchWeather() {
+        async function fetchWeather(lat, lon) {
             setLoading(true);
             try {
-                const response = await fetch(`https://api.hgbrasil.com/weather?key=${API_KEY}&format=json-cors&city_name=${city}`);
+                const response = await fetch(`https://api.hgbrasil.com/weather?key=${API_KEY}&format=json-cors&city_name=${city}&lat=${lat}&lon=${lon}`);
                 const data = await response.json();
                 if (data.results) {
                     setWeather(data.results);
                     setForecast(data.results.forecast.slice(1, 4));
+                } else {
+                    setError("Não foi possível obter os dados do clima.");
                 }
             } catch (error) {
                 console.error("Erro ao buscar dados da API: ", error);
@@ -30,7 +33,21 @@ function App() {
             }
         }
 
-        fetchWeather();
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    fetchWeather(latitude, longitude);
+                },
+                (error) => {
+                    setError("Permissão de localização negada." + error);
+                    setLoading(false);
+                },
+            );
+        } else {
+            setError("Geolocalização não suportada pelo navegador.");
+            setLoading(false);
+        }
     }, [city]);
 
     return (
@@ -40,7 +57,12 @@ function App() {
                 <Loading />
             ) : weather ? (
                 <>
-                    <h1>{weather.city}</h1>
+                    <h1>
+                        {weather.city}
+                        <span>
+                            Nascer do Sol: {weather.sunrise} | Pôr do Sol: {weather.sunset}
+                        </span>
+                    </h1>
                     <WeatherCard weather={weather} />
                     <ForecastList forecasts={forecast} />
                 </>
